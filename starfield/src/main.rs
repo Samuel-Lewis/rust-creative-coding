@@ -6,8 +6,6 @@ use std::env;
 
 const MAX_STARS: u32 = 400;
 
-/// This doc string acts as a help message when the user runs '--help'
-/// as do all doc strings on fields
 #[derive(Clap)]
 #[clap(version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"))]
 struct Opts {
@@ -15,20 +13,16 @@ struct Opts {
     fps: bool,
 }
 
-// let app = App::new(env!("CARGO_PKG_NAME"))
-// .author(env!("CARGO_PKG_AUTHORS"))
-// .version(env!("CARGO_PKG_VERSION"))
 fn main() {
     nannou::app(model).update(update).simple_window(view).run();
 }
 
 struct Model {
     stars: Vec<Star>,
-    show_fps: bool,
+    options: Opts,
 }
 
 fn model(app: &App) -> Model {
-    let opts: Opts = Opts::parse();
     let mut stars: Vec<Star> = Vec::new();
 
     for _ in 1..MAX_STARS {
@@ -37,7 +31,7 @@ fn model(app: &App) -> Model {
 
     Model {
         stars,
-        show_fps: opts.fps,
+        options: Opts::parse(),
     }
 }
 
@@ -49,10 +43,10 @@ fn update(app: &App, model: &mut Model, _update: Update) {
 
 fn view(app: &App, model: &Model, frame: Frame) {
     frame.clear(BLACK);
+    let draw = app.draw();
 
     // Print FPS
-    let draw = app.draw();
-    if model.show_fps {
+    if model.options.fps {
         draw.text(format!("{:.0}", app.fps()).as_str())
             .color(RED)
             .xy(app.window_rect().top_left() + pt2(30.0, -30.0));
